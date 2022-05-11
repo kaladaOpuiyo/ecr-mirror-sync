@@ -1,0 +1,14 @@
+image:
+  repository:
+  tag: 0.0.1
+  pullPolicy: Always
+schedule: "0 */12 * * *" # "0 */12 * * *" #once per day
+serviceAccount:
+  create: true
+  annotations:
+    eks.amazonaws.com/role-arn:
+ecrMirrorSync:
+  insecurePolicy: true
+  debug: true
+  renderTable: false
+  sourceCreds: "" #$DOCKER_USERNAME:$DOCKER_PASSWORD

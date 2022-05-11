@@ -1,0 +1,30 @@
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "allowECRMirrorSyncTo",
+        "Action": [
+          "ecr:DescribeImages"
+        ],
+        "Effect": "Allow",
+        "Resource": "*"
+      },
+      {
+        "Sid": "allowECRMirrorSyncTo",
+        "Action": [
+          "tag:GetResources"
+        ],
+        "Effect": "Allow",
+        "Resource": "*"
+      },
+      {
+        "Sid": "allowECRMirrorSyncTo",
+        "Action": [
+          "ecr:GetAuthorizationToken"
+        ],
+        "Effect": "Allow",
+        "Resource": "*"
+      }
+    ]
+  }
