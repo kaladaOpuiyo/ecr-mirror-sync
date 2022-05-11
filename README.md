@@ -8,10 +8,18 @@ The `ecr-mirror-sync` tool allows you to sync publicly accessible images into EC
 
 -  List repositories with unique identifier tags in ECR.
 -  Copy a single image:tag into an ECR repository
--   Sync all images with unique identifier tags with their corresponding public image
+-  Sync all images with unique identifier tags with their corresponding public image
 
 
 ## Installation
+
+Prior to running this, you'll need to ensure there is are ecr repositories the correct resource tags. Upsteam tags can be a `/` seperated list.  
+
+Example 
+```
+upstream_image = "ghcr.io/kedacore/keda"
+upstream_tags  = "2.4.0/2.5.0"
+```
 
 Set the `ECR_REGISTRY` in Makefile before running 
 
@@ -27,7 +35,7 @@ make image
 ```
 ### helm 
 
-Set `eks.amazonaws.com/role-arn` and `repository` in values.yaml file before running. If you are not using ISRA you can pass creds via env and app should work. We're only support using IRSA here.
+Set `eks.amazonaws.com/role-arn` and `repository` in values.yaml file before running. If you are not using ISRA you can pass creds via env and app should work. We only support using IRSA here.
 
 ```
 helm upgrade \
