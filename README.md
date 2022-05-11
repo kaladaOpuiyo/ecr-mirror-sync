@@ -13,7 +13,7 @@ The `ecr-mirror-sync` tool allows you to sync publicly accessible images into EC
 
 ## Installation
 
-Prior to running this, you'll need to ensure there is are ecr repositories the correct resource tags. Upsteam tags can be a `/` seperated list.  
+Prior to running this, you'll need to ensure there are ecr repositories with the correct resource tags. Upsteam tags can be a `/` seperated list.  
 
 Example 
 ```
