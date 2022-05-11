@@ -66,7 +66,7 @@ Global Flags:
 ### **ecr-mirror-sync copy**
 
 ```
-ecr-mirror-sync copy --src ghcr.io/kedacore/keda:2.4.0 --dest 928314642453.dkr.ecr.us-east-1.amazonaws.com/external/ghcr.io/kedacore/keda --insecure-policy --render-table --dry-run
+ecr-mirror-sync copy --src ghcr.io/kedacore/keda:2.4.0 --dest $AWS_ACCOUNT_ID.dkr.ecr.us-east-1.amazonaws.com/external/ghcr.io/kedacore/keda --insecure-policy --render-table --dry-run
 ```
 
 ```
