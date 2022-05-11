@@ -61,11 +61,11 @@ func (opts *Copy) Copy(args []string, stdout io.Writer) (retErr error) {
 		log.Error("Invalid destination name %s: %v", imageNames[1], err)
 	}
 
-	sourceCtx, err := opts.srcImage.NewSystemContext()
+	srcCtx, err := opts.srcImage.NewSystemContext()
 	if err != nil {
 		return err
 	}
-	destinationCtx, err := opts.destImage.NewSystemContext()
+	destCtx, err := opts.destImage.NewSystemContext()
 	if err != nil {
 		return err
 	}
@@ -81,13 +81,13 @@ func (opts *Copy) Copy(args []string, stdout io.Writer) (retErr error) {
 
 	return retry.RetryIfNecessary(ctx, func() error {
 		_, err := copy.Image(ctx, policyContext, destRef, srcRef, &copy.Options{
-			DestinationCtx:        destinationCtx,
+			DestinationCtx:        destCtx,
 			ForceManifestMIMEType: manifest.DockerV2Schema2MediaType,
 			ImageListSelection:    imageListSelection,
 			PreserveDigests:       true,
 			RemoveSignatures:      false,
 			ReportWriter:          stdout,
-			SourceCtx:             sourceCtx,
+			SourceCtx:             srcCtx,
 		})
 		if err != nil {
 			return err
