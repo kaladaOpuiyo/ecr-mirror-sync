@@ -18,8 +18,8 @@ func listCmd() *cobra.Command {
 
 	listCmd := &cobra.Command{
 		Use:   "list",
-		Short: "List  ECR repositories and tags marked for mirroring",
-		Long:  `List  ECR repositories and tags marked for mirroring`,
+		Short: "List ECR repositories and tags marked for mirroring",
+		Long:  `List ECR repositories and tags marked for mirroring`,
 		Run: func(cmd *cobra.Command, args []string) {
 
 			opts := options.MirrorOptions{}

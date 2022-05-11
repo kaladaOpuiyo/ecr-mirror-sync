@@ -39,16 +39,11 @@ func coreOptions() (*cobra.Command, *options.GlobalOptions) {
 		CompletionOptions: cobra.CompletionOptions{DisableDefaultCmd: true},
 		TraverseChildren:  true,
 	}
-	rootCmd.PersistentFlags().BoolVar(&globalOpts.InsecurePolicy, "insecure-policy", false, "run the tool without any policy check")
-	rootCmd.PersistentFlags().StringVar(&globalOpts.OverrideArch, "override-arch", "amd64", "use `ARCH` instead of the architecture of the machine for choosing images")
-	rootCmd.PersistentFlags().StringVar(&globalOpts.OverrideOS, "override-os", "linux", "use `OS` instead of the running OS for choosing images")
-	rootCmd.PersistentFlags().StringVar(&globalOpts.OverrideVariant, "override-variant", "", "use `VARIANT` instead of the running architecture variant for choosing images")
-	rootCmd.PersistentFlags().StringVar(&globalOpts.PolicyPath, "policy", "", "Path to a trust policy file")
 
 	rootCmd.AddCommand(
 		listCmd(),
-		copyCmd(&globalOpts),
-		syncCmd(&globalOpts),
+		copyCmd(),
+		syncCmd(),
 	)
 	return rootCmd, &globalOpts
 }

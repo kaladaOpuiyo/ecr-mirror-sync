@@ -42,6 +42,19 @@ func ImageFlags(global *GlobalOptions, flagPrefix, credsOptionAlias string) (pfl
 	return fs, opts
 }
 
+func GlobalFlags() (pflag.FlagSet, *GlobalOptions) {
+	opts := GlobalOptions{}
+	fs := pflag.FlagSet{}
+
+	fs.BoolVar(&opts.InsecurePolicy, "insecure-policy", false, "run the tool without any policy check")
+	fs.StringVar(&opts.OverrideArch, "override-arch", "amd64", "use `ARCH` instead of the architecture of the machine for choosing images")
+	fs.StringVar(&opts.OverrideOS, "override-os", "linux", "use `OS` instead of the running OS for choosing images")
+	fs.StringVar(&opts.OverrideVariant, "override-variant", "", "use `VARIANT` instead of the running architecture variant for choosing images")
+	fs.StringVar(&opts.PolicyPath, "policy", "", "Path to a trust policy file")
+
+	return fs, &opts
+}
+
 func RetryFlags() (pflag.FlagSet, *retry.RetryOptions) {
 	opts := retry.RetryOptions{}
 	fs := pflag.FlagSet{}

@@ -20,12 +20,13 @@ var (
 	upstreamImageTag string
 )
 
-func copyCmd(global *options.GlobalOptions) *cobra.Command {
+func copyCmd() *cobra.Command {
 
-	srcFlags, srcOpts := options.ImageFlags(global, "src-", "screds")
-	destFlags, destOpts := options.ImageDestFlags(global, "dest-", "dcreds")
+	globalFlags, globalOpts := options.GlobalFlags()
+	srcFlags, srcOpts := options.ImageFlags(globalOpts, "src-", "screds")
+	destFlags, destOpts := options.ImageDestFlags(globalOpts, "dest-", "dcreds")
 	retryFlags, retryOpts := options.RetryFlags()
-	mirrorFlags, mirrorOpts := options.MirrorFlags(global, srcOpts, destOpts, retryOpts)
+	mirrorFlags, mirrorOpts := options.MirrorFlags(globalOpts, srcOpts, destOpts, retryOpts)
 
 	copyCmd := &cobra.Command{
 		Use:   "copy",
@@ -45,6 +46,7 @@ func copyCmd(global *options.GlobalOptions) *cobra.Command {
 	}
 
 	flags := copyCmd.Flags()
+	flags.AddFlagSet(&globalFlags)
 	flags.AddFlagSet(&destFlags)
 	flags.AddFlagSet(&mirrorFlags)
 	flags.AddFlagSet(&retryFlags)
