@@ -27,7 +27,7 @@ func (opts *Manifest) Manifest(args []string) (rawManifest []byte, err error) {
 	// we expect that the other repositories are accessible anonymously
 	anonymous, _ := regexp.MatchString(`([^\s]+)\.([^\s]+)\/([^\s]+)`, strings.TrimPrefix(args[0], "docker://"))
 
-	if anonymous && !strings.Contains(args[0], "docker.io") && opts.image.DockerImageOptions.Transport == "docker" {
+	if anonymous && !strings.Contains(args[0], "docker.io") {
 
 		opts.image.DockerImageOptions.CredsOption = ""
 	}

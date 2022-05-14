@@ -10,11 +10,11 @@ import (
 	"github.com/containers/image/v5/types"
 )
 
-const Version = "1.0.0"
-
-var defaultUserAgent = "ecr-mirror-sync/" + Version
-
-const RemoteTransport = "docker"
+const (
+	Version          = "1.0.0"
+	DefaultUserAgent = "ecr-mirror-sync/" + Version
+	RemoteTransport  = "docker"
+)
 
 // errorShouldDisplayUsage is a subtype of error used by command handlers to indicate that cli.ShowSubcommandHelp should be called.
 type ErrorShouldDisplayUsage struct {
@@ -100,7 +100,7 @@ func (opts *GlobalOptions) GetPolicyContext() (*signature.PolicyContext, error) 
 func (opts *GlobalOptions) newSystemContext() *types.SystemContext {
 	ctx := &types.SystemContext{
 		ArchitectureChoice:      opts.OverrideArch,
-		DockerRegistryUserAgent: defaultUserAgent,
+		DockerRegistryUserAgent: DefaultUserAgent,
 		OSChoice:                opts.OverrideOS,
 		VariantChoice:           opts.OverrideVariant,
 	}
