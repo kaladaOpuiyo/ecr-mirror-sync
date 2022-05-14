@@ -14,6 +14,8 @@ const Version = "1.0.0"
 
 var defaultUserAgent = "ecr-mirror-sync/" + Version
 
+const RemoteTransport = "docker"
+
 // errorShouldDisplayUsage is a subtype of error used by command handlers to indicate that cli.ShowSubcommandHelp should be called.
 type ErrorShouldDisplayUsage struct {
 	error

@@ -21,7 +21,6 @@ func DockerImageFlags(global *GlobalOptions, flagPrefix, credsOptionAlias string
 	fs.StringVar(&flags.DockerCertPath, flagPrefix+"cert-dir", "", "use certificates at `PATH` (*.crt, *.cert, *.key) to connect to the registry or daemon")
 	fs.StringVar(&flags.Password, flagPrefix+"password", "", "Password for accessing the registry")
 	fs.StringVar(&flags.RegistryToken, flagPrefix+"registry-token", "", "Provide a Bearer token for accessing the registry")
-	fs.StringVar(&flags.Transport, flagPrefix+"transport", "docker", "Registry transport. Defaults to docker")
 	fs.StringVar(&flags.UserName, flagPrefix+"username", "", "Username for accessing the registry")
 	return fs, &flags
 }
@@ -30,8 +29,6 @@ func ImageFlags(global *GlobalOptions, flagPrefix, credsOptionAlias string) (pfl
 	dockerFlags, opts := DockerImageFlags(global, flagPrefix, credsOptionAlias)
 
 	fs := pflag.FlagSet{}
-	fs.StringVar(&opts.SharedBlobDir, flagPrefix+"shared-blob-dir", "", "`DIRECTORY` to use to share blobs across OCI repositories")
-	fs.StringVar(&opts.DockerDaemonHost, flagPrefix+"daemon-host", "", "use docker daemon host at `HOST` (docker-daemon: only)")
 	fs.AddFlagSet(&dockerFlags)
 	return fs, opts
 }
@@ -80,7 +77,6 @@ func ImageDestFlags(global *GlobalOptions, flagPrefix, credsOptionAlias string) 
 	_, genericOptions := ImageFlags(global, flagPrefix, credsOptionAlias)
 	opts := ImageDestOptions{ImageOptions: genericOptions}
 	fs := pflag.FlagSet{}
-	// fs.AddFlagSet(&genericFlags)
 	fs.BoolVar(&opts.precomputeDigests, flagPrefix+"precompute-digests", true, "Precompute digests to prevent uploading layers already on the registry using the 'docker' transport.")
 	return fs, &opts
 }

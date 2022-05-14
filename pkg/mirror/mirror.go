@@ -87,7 +87,7 @@ func (p *MirrorProvider) getImageDigest(mirror MirrorRepository, tag string) (st
 	var err error
 	var raw []byte
 
-	mirrorImageFlag := fmt.Sprintf("docker://%s:%s", mirror.UpstreamImage, tag)
+	mirrorImageFlag := fmt.Sprintf("%s://%s:%s", options.RemoteTransport, mirror.UpstreamImage, tag)
 
 	manifestOptions := &options.ManifestOptions{
 		DoNotListTags: true,
@@ -175,12 +175,12 @@ func (p *MirrorProvider) copy(mirrorRepos []MirrorRepository) {
 
 			// check if image tag was provided for in mirror.ECRRespository
 			if !strings.Contains(mirror.ECRRespository, ":") {
-				ecrRespositoryFlag = fmt.Sprintf("%s://%s:%s", p.Options.DestImage.Transport, mirror.ECRRespository, mirror.UpstreamTag)
+				ecrRespositoryFlag = fmt.Sprintf("%s://%s:%s", options.RemoteTransport, mirror.ECRRespository, mirror.UpstreamTag)
 			} else {
-				ecrRespositoryFlag = fmt.Sprintf("%s://%s", p.Options.DestImage.Transport, mirror.ECRRespository)
+				ecrRespositoryFlag = fmt.Sprintf("%s://%s", options.RemoteTransport, mirror.ECRRespository)
 			}
 
-			mirrorImageFlag = fmt.Sprintf("%s://%s:%s", p.Options.DestImage.Transport, mirror.UpstreamImage, mirror.UpstreamTag)
+			mirrorImageFlag = fmt.Sprintf("%s://%s:%s", options.RemoteTransport, mirror.UpstreamImage, mirror.UpstreamTag)
 
 			image, err := ecrSession.DescribeImages(input)
 
