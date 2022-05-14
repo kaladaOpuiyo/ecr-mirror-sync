@@ -44,8 +44,8 @@ func New(opts *options.MirrorOptions) *MirrorProvider {
 		ECRAuthToken:     authorizationToken,
 		ECRTypeFilter:    []*string{aws.String("ecr:repository")},
 		Options:          opts,
-		UpstreamImageKey: aws.String("upstream-image"),
-		UpstreamTagsKey:  aws.String("upstream-tags"),
+		UpstreamImageKey: aws.String(opts.UpstreamImageKey),
+		UpstreamTagsKey:  aws.String(opts.UpstreamTagsKey),
 	}
 }
 
@@ -89,7 +89,7 @@ func (p *MirrorProvider) getImageDigest(mirror MirrorRepository, tag string) (st
 
 	mirrorImageFlag := fmt.Sprintf("docker://%s:%s", mirror.UpstreamImage, tag)
 
-	inspectOptions := &options.InspectOptions{
+	manifestOptions := &options.ManifestOptions{
 		DoNotListTags: true,
 		Global:        p.Options.Global,
 		Image:         *p.Options.SrcImage,
@@ -97,8 +97,8 @@ func (p *MirrorProvider) getImageDigest(mirror MirrorRepository, tag string) (st
 		RetryOpts:     p.Options.RetryOpts,
 	}
 
-	inspect := containers.NewInspectProvider(*inspectOptions)
-	raw, err = inspect.Inspect([]string{mirrorImageFlag})
+	m := containers.NewManifestProvider(*manifestOptions)
+	raw, err = m.Manifest([]string{mirrorImageFlag})
 
 	if err != nil {
 		return "", err
@@ -135,7 +135,7 @@ func (p *MirrorProvider) copy(mirrorRepos []MirrorRepository) {
 	var t table.Writer
 
 	ecrSession := ecr.New(p.AWSClientSession)
-	copy := containers.NewCopyProvider(p.Options)
+	c := containers.NewCopyProvider(p.Options)
 
 	if p.Options.RenderTable {
 		t = table.NewWriter()
@@ -175,12 +175,12 @@ func (p *MirrorProvider) copy(mirrorRepos []MirrorRepository) {
 
 			// check if image tag was provided for in mirror.ECRRespository
 			if !strings.Contains(mirror.ECRRespository, ":") {
-				ecrRespositoryFlag = fmt.Sprintf("docker://%s:%s", mirror.ECRRespository, mirror.UpstreamTag)
+				ecrRespositoryFlag = fmt.Sprintf("%s://%s:%s", p.Options.DestImage.Transport, mirror.ECRRespository, mirror.UpstreamTag)
 			} else {
-				ecrRespositoryFlag = fmt.Sprintf("docker://%s", mirror.ECRRespository)
+				ecrRespositoryFlag = fmt.Sprintf("%s://%s", p.Options.DestImage.Transport, mirror.ECRRespository)
 			}
 
-			mirrorImageFlag = fmt.Sprintf("docker://%s:%s", mirror.UpstreamImage, mirror.UpstreamTag)
+			mirrorImageFlag = fmt.Sprintf("%s://%s:%s", p.Options.DestImage.Transport, mirror.UpstreamImage, mirror.UpstreamTag)
 
 			image, err := ecrSession.DescribeImages(input)
 
@@ -203,7 +203,7 @@ func (p *MirrorProvider) copy(mirrorRepos []MirrorRepository) {
 						if p.Options.DryRun {
 							log.WithFields(fromToFields).Infof("Would have copied image %s", mirror.UpstreamTag)
 						} else {
-							err = copy.Copy([]string{mirrorImageFlag, ecrRespositoryFlag}, os.Stdout)
+							err = c.Copy([]string{mirrorImageFlag, ecrRespositoryFlag}, os.Stdout)
 
 							if err != nil {
 								mirror.Status = color.Ize(color.Red, fmt.Sprintf("failed to mirror: %s", err.Error()))
@@ -242,7 +242,7 @@ func (p *MirrorProvider) copy(mirrorRepos []MirrorRepository) {
 						if p.Options.DryRun {
 							log.WithFields(fromToFields).WithFields(fromToFields).Infof("Would have copied image %s", mirror.UpstreamTag)
 						} else {
-							err = copy.Copy([]string{mirrorImageFlag, ecrRespositoryFlag}, os.Stdout)
+							err = c.Copy([]string{mirrorImageFlag, ecrRespositoryFlag}, os.Stdout)
 
 							if err != nil {
 								mirror.Status = color.Ize(color.Red, fmt.Sprintf("failed to mirror: %s", err.Error()))

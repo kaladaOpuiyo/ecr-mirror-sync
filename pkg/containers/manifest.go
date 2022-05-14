@@ -11,8 +11,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-func NewInspectProvider(options options.InspectOptions) *Inspect {
-	return &Inspect{
+func NewManifestProvider(options options.ManifestOptions) *Manifest {
+	return &Manifest{
 
 		global:        options.Global,
 		retryOpts:     options.RetryOpts,
@@ -21,13 +21,13 @@ func NewInspectProvider(options options.InspectOptions) *Inspect {
 	}
 }
 
-func (opts *Inspect) Inspect(args []string) (rawManifest []byte, err error) {
+func (opts *Manifest) Manifest(args []string) (rawManifest []byte, err error) {
 
 	// When Syncing a combinationn of images from multiple repositories, we favor dockerhub when using command line flags to pass credentials
 	// we expect that the other repositories are accessible anonymously
 	anonymous, _ := regexp.MatchString(`([^\s]+)\.([^\s]+)\/([^\s]+)`, strings.TrimPrefix(args[0], "docker://"))
 
-	if anonymous && !strings.Contains(args[0], "docker.io") && opts.image.DockerImageOptions.CredType == "docker" {
+	if anonymous && !strings.Contains(args[0], "docker.io") && opts.image.DockerImageOptions.Transport == "docker" {
 
 		opts.image.DockerImageOptions.CredsOption = ""
 	}

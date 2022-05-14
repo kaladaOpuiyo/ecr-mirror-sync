@@ -15,14 +15,15 @@ import (
 )
 
 // Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
+// This is called by main.main(). It only needs to happen once to the cmd.
 func Execute() {
 
 	if reexec.Init() {
 		return
 	}
-	rootCmd, _ := coreOptions()
-	if err := rootCmd.Execute(); err != nil {
+
+	cmd, _ := coreOptions()
+	if err := cmd.Execute(); err != nil {
 		logrus.Fatal(err)
 	}
 }
@@ -30,7 +31,7 @@ func Execute() {
 //  coreOptions returns a cobra.Command, and the underlying globalOptions object, to be run or tested.
 func coreOptions() (*cobra.Command, *options.GlobalOptions) {
 	globalOpts := options.GlobalOptions{}
-	rootCmd := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:               "ecr-mirror-sync",
 		Long:              "Tool used to Sync Public Images with ECR Repositories",
 		RunE:              requireSubcommand,
@@ -40,12 +41,12 @@ func coreOptions() (*cobra.Command, *options.GlobalOptions) {
 		TraverseChildren:  true,
 	}
 
-	rootCmd.AddCommand(
+	cmd.AddCommand(
 		listCmd(),
 		copyCmd(),
 		syncCmd(),
 	)
-	return rootCmd, &globalOpts
+	return cmd, &globalOpts
 }
 
 // requireSubcommand returns an error if no sub command is provided

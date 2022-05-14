@@ -52,6 +52,6 @@ func copyCmd() *cobra.Command {
 	flags.AddFlagSet(&retryFlags)
 	flags.AddFlagSet(&srcFlags)
 	flags.StringVarP(&ecrRespository, "dest", "d", "", "ecr destingation repository")
-	flags.StringVarP(&upstreamImageTag, "src", "s", "", "public Docker hub image:tag source")
+	flags.StringVarP(&upstreamImageTag, "src", "s", "", "source image:tag")
 	return copyCmd
 }

@@ -23,6 +23,7 @@ func listCmd() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 
 			opts := options.MirrorOptions{}
+
 			opts.RenderTable = true
 			mirrorRepos := mirror.New(&opts)
 			start := time.Now()

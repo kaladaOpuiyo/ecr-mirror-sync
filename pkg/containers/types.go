@@ -16,7 +16,7 @@ type Copy struct {
 	srcImage         options.ImageOptions
 }
 
-type Inspect struct {
+type Manifest struct {
 	global        *options.GlobalOptions
 	image         options.ImageOptions
 	retryOpts     *retry.RetryOptions

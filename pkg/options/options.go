@@ -31,9 +31,11 @@ type MirrorOptions struct {
 	RenderTable      bool   //
 	RetryOpts        *retry.RetryOptions
 	SrcImage         *ImageOptions
+	UpstreamImageKey string
+	UpstreamTagsKey  string
 }
 
-type InspectOptions struct {
+type ManifestOptions struct {
 	DoNotListTags bool // Do not list all tags available in the same repository
 	Global        *GlobalOptions
 	Image         ImageOptions
@@ -46,7 +48,7 @@ type InspectOptions struct {
 // (e.g. may differ between the source and destination of a copy)
 type DockerImageOptions struct {
 	CredsOption    string // username[:password] for accessing a registry
-	CredType       string
+	Transport      string
 	DockerCertPath string         // A directory using Docker-like *.{crt,cert,key} files for connecting to a registry or a daemon
 	Global         *GlobalOptions // May be shared across several imageOptions instances.
 	NoCreds        bool           // Access the registry anonymously
