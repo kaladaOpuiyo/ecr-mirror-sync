@@ -25,7 +25,7 @@ ENV CGO_ENABLED=0
 WORKDIR /go/src/ecr-mirror-sync
 COPY . .
 
-RUN go build -v -o /ecr-mirror-sync -ldflags="-X 'stash.logicmonitor.com/techops/ecr-mirror-sync.git/version.Version=${VERSION}'" -tags 'btrfs_noversion libdm_no_deferred_remove containers_image_openpgp' ./main.go 
+RUN go build -v -o /ecr-mirror-sync -ldflags="-X 'github.com/kaladaOpuiyo/ecr-mirror-sync/version.Version=${VERSION}'" -tags 'btrfs_noversion libdm_no_deferred_remove containers_image_openpgp' ./main.go 
 
 FROM  alpine:3.15.4
 

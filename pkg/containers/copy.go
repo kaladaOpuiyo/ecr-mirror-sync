@@ -32,7 +32,9 @@ func (opts *Copy) Copy(args []string, stdout io.Writer) (retErr error) {
 	// we expect that the other repositories are accessible anonymously.
 	anonymous, _ := regexp.MatchString(`([^\s]+)\.([^\s]+)\/([^\s]+)`, strings.TrimPrefix(args[0], "docker://"))
 
-	if anonymous && !strings.Contains(args[0], "docker.io") {
+	if anonymous && !strings.Contains(args[0], "docker.io") &&
+		opts.srcImage.DockerImageOptions.Transport == "docker" &&
+		opts.srcImage.DockerImageOptions.Global.AuthFilePath == "" {
 
 		opts.srcImage.DockerImageOptions.CredsOption = ""
 	}

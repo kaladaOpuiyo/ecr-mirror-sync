@@ -27,6 +27,7 @@ type MirrorOptions struct {
 	DestImage        *ImageDestOptions
 	DryRun           bool // Dry run does not copy
 	Global           *GlobalOptions
+	MirrorRepoPrefix string
 	Quiet            bool   // Suppress output information when copying images
 	Region           string // aws region use for ecr repos
 	RemoveSignatures bool   // Do not copy signatures from the source image
@@ -35,6 +36,7 @@ type MirrorOptions struct {
 	SrcImage         *ImageOptions
 	UpstreamImageKey string
 	UpstreamTagsKey  string
+	WorkerPoolSize   string
 }
 
 type ManifestOptions struct {
@@ -45,9 +47,6 @@ type ManifestOptions struct {
 	RetryOpts     *retry.RetryOptions
 }
 
-// dockerImageOptions collects CLI flags specific to the "docker" transport, which are
-// the same across subcommands, but may be different for each image
-// (e.g. may differ between the source and destination of a copy)
 type DockerImageOptions struct {
 	CredsOption    string // username[:password] for accessing a registry
 	Transport      string
@@ -59,8 +58,6 @@ type DockerImageOptions struct {
 	UserName       string         // username for accessing a registry
 }
 
-// imageOptions collects CLI flags which are the same across subcommands, but may be different for each image
-// (e.g. may differ between the source and destination of a copy)
 type ImageOptions struct {
 	DockerDaemonHost string // docker-daemon: host to connect to
 	DockerImageOptions
@@ -77,7 +74,7 @@ type GlobalOptions struct {
 	PolicyPath      string        // Path to a signature verification policy file
 }
 
-// getPolicyContext returns a *signature.PolicyContext based on opts.
+// GetPolicyContext returns a *signature.PolicyContext based on opts.
 func (opts *GlobalOptions) GetPolicyContext() (*signature.PolicyContext, error) {
 	var policy *signature.Policy // This could be cached across calls in opts.
 	var err error
@@ -95,7 +92,7 @@ func (opts *GlobalOptions) GetPolicyContext() (*signature.PolicyContext, error) 
 	return signature.NewPolicyContext(policy)
 }
 
-// newSystemContext returns a *types.SystemContext corresponding to opts.
+// NewSystemContext returns a *types.SystemContext corresponding to opts.
 // It is guaranteed to return a fresh instance, so it is safe to make additional updates to it.
 func (opts *GlobalOptions) newSystemContext() *types.SystemContext {
 	ctx := &types.SystemContext{
@@ -108,7 +105,7 @@ func (opts *GlobalOptions) newSystemContext() *types.SystemContext {
 	return ctx
 }
 
-// timeoutContext returns a context.Context and a cancellation callback based on opts.
+// TimeoutContext returns a context.Context and a cancellation callback based on opts.
 // The caller should usually "defer cancel()" immediately after calling this.
 func (opts *GlobalOptions) TimeoutContext() (context.Context, context.CancelFunc) {
 	ctx := context.Background()
@@ -119,7 +116,7 @@ func (opts *GlobalOptions) TimeoutContext() (context.Context, context.CancelFunc
 	return ctx, cancel
 }
 
-// newSystemContext returns a *types.SystemContext corresponding to opts.
+// NewSystemContext returns a *types.SystemContext corresponding to opts.
 // It is guaranteed to return a fresh instance, so it is safe to make additional updates to it.
 func (opts *ImageOptions) NewSystemContext() (*types.SystemContext, error) {
 	// *types.SystemContext instance from globalOptions
@@ -173,7 +170,7 @@ func (opts *ImageOptions) NewSystemContext() (*types.SystemContext, error) {
 	return ctx, nil
 }
 
-// imageDestOptions is a superset of imageOptions specialized for image destinations.
+// ImageDestOptions is a superset of imageOptions specialized for image destinations.
 type ImageDestOptions struct {
 	*ImageOptions
 	precomputeDigests bool // Precompute digests to dedup layers when saving to the docker: transport

@@ -22,19 +22,20 @@ func NewManifestProvider(options options.ManifestOptions) *Manifest {
 }
 
 func (opts *Manifest) Manifest(args []string) (rawManifest []byte, err error) {
+	var (
+		src types.ImageSource
+	)
 
 	// When Syncing a combinationn of images from multiple repositories, we favor dockerhub when using command line flags to pass credentials
 	// we expect that the other repositories are accessible anonymously
 	anonymous, _ := regexp.MatchString(`([^\s]+)\.([^\s]+)\/([^\s]+)`, strings.TrimPrefix(args[0], "docker://"))
 
-	if anonymous && !strings.Contains(args[0], "docker.io") {
+	if anonymous && !strings.Contains(args[0], "docker.io") &&
+		opts.image.DockerImageOptions.Transport == "docker" &&
+		opts.image.DockerImageOptions.Global.AuthFilePath == "" {
 
 		opts.image.DockerImageOptions.CredsOption = ""
 	}
-
-	var (
-		src types.ImageSource
-	)
 
 	ctx, cancel := opts.global.TimeoutContext()
 	defer cancel()

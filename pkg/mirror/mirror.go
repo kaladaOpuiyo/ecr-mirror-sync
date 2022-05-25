@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/TwiN/go-color"
@@ -19,16 +19,19 @@ import (
 	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/aws/aws-sdk-go/service/resourcegroupstaggingapi"
 	"github.com/containers/image/manifest"
+	"github.com/gammazero/workerpool"
 	"github.com/jedib0t/go-pretty/table"
 	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 )
 
 func New(opts *options.MirrorOptions) *MirrorProvider {
+
 	if opts.Debug {
-		logrus.SetLevel(logrus.DebugLevel)
+		log.SetLevel(logrus.DebugLevel)
 	}
-	token, err := options.GetECRAuthToken()
+
+	token, err := options.GetECRAuthToken(aws.String(opts.Region))
 	if err != nil {
 		return nil
 	}
@@ -39,7 +42,7 @@ func New(opts *options.MirrorOptions) *MirrorProvider {
 	}
 
 	return &MirrorProvider{
-		AWSClientSession: options.GetDefaultAwsClient(),
+		AWSClientSession: options.GetDefaultAwsClient(aws.String(opts.Region)),
 		DefaultECRRegion: aws.String(opts.Region),
 		ECRAuthToken:     authorizationToken,
 		ECRTypeFilter:    []*string{aws.String("ecr:repository")},
@@ -97,8 +100,8 @@ func (p *MirrorProvider) getImageDigest(mirror MirrorRepository, tag string) (st
 		RetryOpts:     p.Options.RetryOpts,
 	}
 
-	m := containers.NewManifestProvider(*manifestOptions)
-	raw, err = m.Manifest([]string{mirrorImageFlag})
+	ms := containers.NewManifestProvider(*manifestOptions)
+	raw, err = ms.Manifest([]string{mirrorImageFlag})
 
 	if err != nil {
 		return "", err
@@ -131,8 +134,12 @@ func (p *MirrorProvider) getImageDigest(mirror MirrorRepository, tag string) (st
 }
 
 func (p *MirrorProvider) copy(mirrorRepos []MirrorRepository) {
-	var wg sync.WaitGroup
-	var t table.Writer
+
+	var (
+		t    table.Writer
+		pool int
+		err  error
+	)
 
 	ecrSession := ecr.New(p.AWSClientSession)
 	c := containers.NewCopyProvider(p.Options)
@@ -145,31 +152,51 @@ func (p *MirrorProvider) copy(mirrorRepos []MirrorRepository) {
 	totalSucceeded := 0
 	totalfailed := 0
 
-	wg.Add(len(mirrorRepos))
-
 	p.Options.DestImage.CredsOption = string(p.ECRAuthToken)
 
-	p.Options.Global.CommandTimeout = 20 * time.Minute
+	p.Options.Global.CommandTimeout = 20 * time.Minute // Hard coded by default
+
+	if p.Options.WorkerPoolSize != "" {
+		pool, err = strconv.Atoi(p.Options.WorkerPoolSize)
+		if err != nil {
+			log.Fatalf("%s", err)
+		}
+	} else {
+		pool = len(mirrorRepos)
+	}
+
+	wp := workerpool.New(pool)
+
+	log.Infof("Batch size for syncing images: %v", pool)
 
 	for _, mirror := range mirrorRepos {
-		go func(wg *sync.WaitGroup, mirror MirrorRepository) {
-			defer wg.Done()
 
-			var ecrRespositoryFlag string
-			var mirrorImageFlag string
+		mirror := mirror
+
+		wp.Submit(func() {
+
+			var (
+				ecrRespositoryFlag string
+				mirrorImageFlag    string
+				ecrRepo            string
+			)
 
 			fromToFields := log.Fields{
 				"from": fmt.Sprintf("%s:%s", mirror.UpstreamImage, mirror.UpstreamTag),
 				"to":   fmt.Sprintf("%s:%s", mirror.ECRRespository, mirror.UpstreamTag),
 			}
 
-			r := "external/" + mirror.UpstreamImage
+			if p.Options.MirrorRepoPrefix != "" {
+				ecrRepo = fmt.Sprintf("%s/%s", p.Options.MirrorRepoPrefix, mirror.UpstreamImage)
+			} else {
+				ecrRepo = mirror.UpstreamImage
+			}
 
 			imageTagFilter := &ecr.ImageIdentifier{
 				ImageTag: &mirror.UpstreamTag,
 			}
 			input := &ecr.DescribeImagesInput{
-				RepositoryName: &r,
+				RepositoryName: &ecrRepo,
 				ImageIds:       []*ecr.ImageIdentifier{imageTagFilter},
 			}
 
@@ -220,8 +247,11 @@ func (p *MirrorProvider) copy(mirrorRepos []MirrorRepository) {
 			}
 
 			if mirror.Status == "" {
-				var digest string
-				var err error
+
+				var (
+					digest string
+					err    error
+				)
 
 				if p.Options.DryRun {
 					log.WithFields(fromToFields).Infof("Would get digest for public image tag %s", mirror.UpstreamTag)
@@ -275,9 +305,9 @@ func (p *MirrorProvider) copy(mirrorRepos []MirrorRepository) {
 					{mirror.UpstreamImage, mirror.ECRRespository, mirror.UpstreamTag, mirror.Status},
 				})
 			}
-		}(&wg, mirror)
+		})
 	}
-	wg.Wait()
+	wp.StopWait()
 
 	if p.Options.RenderTable {
 

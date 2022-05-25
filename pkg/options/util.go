@@ -61,8 +61,8 @@ func ParseImageSource(ctx context.Context, opts *ImageOptions, name string) (typ
 	return ref.NewImageSource(ctx, sys)
 }
 
-func GetDefaultAwsClient() *session.Session {
-	return session.Must(session.NewSessionWithOptions(session.Options{Config: aws.Config{Region: DefaultECRRegion}, SharedConfigState: session.SharedConfigEnable}))
+func GetDefaultAwsClient(region *string) *session.Session {
+	return session.Must(session.NewSessionWithOptions(session.Options{Config: aws.Config{Region: region}, SharedConfigState: session.SharedConfigEnable}))
 }
 
 func ECRRepofilters() *resourcegroupstaggingapi.GetResourcesInput {
@@ -81,8 +81,8 @@ func ECRRepofilters() *resourcegroupstaggingapi.GetResourcesInput {
 	}
 }
 
-func GetECRAuthToken() (*string, error) {
-	svc := ecr.New(GetDefaultAwsClient())
+func GetECRAuthToken(region *string) (*string, error) {
+	svc := ecr.New(GetDefaultAwsClient(region))
 	input := &ecr.GetAuthorizationTokenInput{}
 	ecrToken, err := svc.GetAuthorizationToken(input)
 

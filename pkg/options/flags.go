@@ -66,8 +66,11 @@ func MirrorFlags(global *GlobalOptions, srcOpts *ImageOptions, destOpts *ImageDe
 	fs.BoolVar(&flags.Debug, "debug", false, "enable debug output")
 	fs.BoolVar(&flags.DryRun, "dry-run", false, "Run without actually copying data")
 	fs.BoolVar(&flags.RenderTable, "render-table", false, "Render tables")
+	fs.StringVar(&flags.MirrorRepoPrefix, "prefix", "", "prefix for external images in ecr")
+	fs.StringVar(&flags.Region, "region", "us-east-1", "ecr region for to interactive with")
 	fs.StringVar(&flags.UpstreamImageKey, "image-key", "upstream-image", "aws resource tag for upstream image")
 	fs.StringVar(&flags.UpstreamTagsKey, "tag-key", "upstream-tags", "aws resource tag for upstream tags")
+	fs.StringVar(&flags.WorkerPoolSize, "batch", "", "batch size for syncing images, default is all")
 
 	return fs, &flags
 }

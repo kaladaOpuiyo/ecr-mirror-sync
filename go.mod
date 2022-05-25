@@ -6,16 +6,15 @@ require (
 	github.com/TwiN/go-color v1.1.0
 	github.com/aws/aws-sdk-go v1.44.9
 	github.com/containers/common v0.48.0
-	github.com/containers/image v3.0.2+incompatible
 	github.com/containers/image/v5 v5.21.1
-	github.com/containers/ocicrypt v1.1.4-0.20220428134531-566b808bdf6f
-	github.com/docker/distribution v2.8.1+incompatible
 	github.com/docker/docker v20.10.15+incompatible
+	github.com/gammazero/workerpool v1.1.2
 	github.com/jedib0t/go-pretty v4.3.0+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
+	github.com/containers/image v3.0.2+incompatible
 )
 
 require (
@@ -30,13 +29,16 @@ require (
 	github.com/containerd/cgroups v1.0.3 // indirect
 	github.com/containerd/stargz-snapshotter/estargz v0.11.4 // indirect
 	github.com/containers/libtrust v0.0.0-20200511145503-9c3a6c22cd9a // indirect
+	github.com/containers/ocicrypt v1.1.4-0.20220428134531-566b808bdf6f // indirect
 	github.com/containers/storage v1.40.0 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.3 // indirect
+	github.com/docker/distribution v2.8.1+incompatible // indirect
 	github.com/docker/docker-credential-helpers v0.6.4 // indirect
 	github.com/docker/go-connections v0.4.0 // indirect
 	github.com/docker/go-metrics v0.0.1 // indirect
 	github.com/docker/go-units v0.4.0 // indirect
 	github.com/docker/libtrust v0.0.0-20160708172513-aabc10ec26b7 // indirect
+	github.com/gammazero/deque v0.1.0 // indirect
 	github.com/ghodss/yaml v1.0.0 // indirect
 	github.com/go-openapi/errors v0.19.8 // indirect
 	github.com/go-openapi/strfmt v0.21.2 // indirect
