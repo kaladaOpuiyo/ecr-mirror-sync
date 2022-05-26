@@ -18,7 +18,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/ecr"
 	"github.com/aws/aws-sdk-go/service/resourcegroupstaggingapi"
-	"github.com/containers/image/manifest"
+	"github.com/containers/image/v5/manifest"
 	"github.com/gammazero/workerpool"
 	"github.com/jedib0t/go-pretty/table"
 	"github.com/sirupsen/logrus"

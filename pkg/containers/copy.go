@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"github.com/containers/common/pkg/retry"
-	"github.com/containers/image/manifest"
 	"github.com/containers/image/v5/copy"
+	"github.com/containers/image/v5/manifest"
 	"github.com/containers/image/v5/transports/alltransports"
 	log "github.com/sirupsen/logrus"
 )
@@ -44,32 +44,32 @@ func (opts *Copy) Copy(args []string, stdout io.Writer) (retErr error) {
 	}
 	imageNames := args
 
-	policyContext, err := opts.global.GetPolicyContext()
-	if err != nil {
-		log.Error("Error loading trust policy: %v", err)
+	policyContext, retErr := opts.global.GetPolicyContext()
+	if retErr != nil {
+		log.Error("Error loading trust policy: %v", retErr)
 	}
 	defer func() {
-		if err := policyContext.Destroy(); err != nil {
-			retErr = fmt.Errorf("(error tearing down policy context: %v): %w", err, retErr)
+		if retErr := policyContext.Destroy(); retErr != nil {
+			retErr = fmt.Errorf("(error tearing down policy context: %v): %w", retErr, retErr)
 		}
 	}()
 
-	srcRef, err := alltransports.ParseImageName(imageNames[0])
-	if err != nil {
-		log.Error("Invalid source name %s: %v", imageNames[0], err)
+	srcRef, retErr := alltransports.ParseImageName(imageNames[0])
+	if retErr != nil {
+		log.Error("Invalid source name %s: %v", imageNames[0], retErr)
 	}
-	destRef, err := alltransports.ParseImageName(imageNames[1])
-	if err != nil {
-		log.Error("Invalid destination name %s: %v", imageNames[1], err)
+	destRef, retErr := alltransports.ParseImageName(imageNames[1])
+	if retErr != nil {
+		log.Error("Invalid destination name %s: %v", imageNames[1], retErr)
 	}
 
-	srcCtx, err := opts.srcImage.NewSystemContext()
-	if err != nil {
-		return err
+	srcCtx, retErr := opts.srcImage.NewSystemContext()
+	if retErr != nil {
+		return retErr
 	}
-	destCtx, err := opts.destImage.NewSystemContext()
-	if err != nil {
-		return err
+	destCtx, retErr := opts.destImage.NewSystemContext()
+	if retErr != nil {
+		return retErr
 	}
 
 	ctx, cancel := opts.global.TimeoutContext()
@@ -82,7 +82,7 @@ func (opts *Copy) Copy(args []string, stdout io.Writer) (retErr error) {
 	imageListSelection := copy.CopySystemImage
 
 	return retry.RetryIfNecessary(ctx, func() error {
-		_, err := copy.Image(ctx, policyContext, destRef, srcRef, &copy.Options{
+		_, retErr := copy.Image(ctx, policyContext, destRef, srcRef, &copy.Options{
 			DestinationCtx:        destCtx,
 			ForceManifestMIMEType: manifest.DockerV2Schema2MediaType,
 			ImageListSelection:    imageListSelection,
@@ -91,10 +91,10 @@ func (opts *Copy) Copy(args []string, stdout io.Writer) (retErr error) {
 			ReportWriter:          stdout,
 			SourceCtx:             srcCtx,
 		})
-		if err != nil {
-			return err
+		if retErr != nil {
+			return retErr
 		}
 
-		return nil
+		return retErr
 	}, opts.retryOpts)
 }
