@@ -2,9 +2,12 @@
 
 ## **Overview**
 
-The `ecr-mirror-sync` tool allows you to sync external/publicly accessible images into ECR. `ecr-mirror-sync` extracts a list of ecr repositories with resources identifier tags indicating the repository is to be mirrored from an external/public image source. (by default these resource tags are `upstream-image` and `upstream-tags`).It then preforms a check to determine if an image already exist in the repository followed by another to determine if the digest found matches the currently available public image digest. By default, requests made to public registries are anonymously, you may however pass credentials to authenticate ( an example of this done using the flag `--src-creds`).This tool can run in a Kubernetes cluster as a Cronjob, scheduled for nightly repository syncing (or what ever frequency you desire).You will need to set up an iam role with the proper resource policy permissions ( an example of the need permission can be found [here](aws/iam-policy.json)). This is needed so `ecr-mirror-sync` can interact with AWS when running in Kubernetes (see [IRSA](https://docs.aws.amazon.com/eks/latest/userguide/specify-service-account-role.html)). If you decide not to trust the robots, the tool can run locally, displaying table output if desired and uses the aws standard credentials mechanism for authenticating.This leverages ideas and patterns from [Skopeo](https://github.com/containers/skopeo).
+The `ecr-mirror-sync` extracts a list of ecr repositories with resource identifier tags indicating the repository is to be mirrored from an external/public image source. (by default, these resource tags are `upstream-image` and `upstream-tags`). It then performs a check to determine if an image already exists in the repository, followed by another to determine if the digest found matches the currently available public image digest. It performs a sync if any of the previous checks are not true. 
 
-![](./misc/example.mov)
+By default, requests made to public registries are anonymous; you may, however, pass credentials to authenticate ( an example of this done using the flag `--src-creds`). This tool can run in a Kubernetes cluster as a Cronjob, scheduled for nightly repository syncing (or whatever frequency you desire). You will need to set up an IAM role with the proper resource policy permissions ( an example of the need for permission can be found [here](aws/iam-policy.json)). This is needed so `ecr-mirror-sync` can interact with AWS when running in Kubernetes (see [IRSA](https://docs.aws.amazon.com/eks/latest/userguide/specify-service-account-role.html)). If you decide not to trust the robots, the tool can run locally, displaying table output if desired, and uses the AWS standard credentials mechanism for authenticating.
+
+This leverages ideas and patterns from [Skopeo](https://github.com/containers/skopeo).
+
 
 ## **Features**
 
